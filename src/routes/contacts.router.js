@@ -3,6 +3,8 @@ const contactsController = require("../controllers/contacts.controller");
 
 const { methodNotAllowed } = require("../controllers/errors.controller");
 
+const avatarUpload = require("../middlewares/avatar-upload.middleware");
+
 const router = express.Router();
 
 module.exports.setup = (app) => {
@@ -13,7 +15,7 @@ module.exports.setup = (app) => {
    * /api/v1/contacts:
    *  get:
    *        summary: Get contacts by filter
-   *        description: Get contacts by filter
+   *        description:  Get contacts by filter
    *        parameters:
    *            - in: query
    *              name: favorite
@@ -25,6 +27,8 @@ module.exports.setup = (app) => {
    *              schema:
    *                type: string
    *              description: Filter by contact name
+   *            - $ref: '#/components/parameters/limitParam'
+   *            - $ref: '#/components/parameters/pageParam'
    *        tags:
    *            - contacts
    *        responses:
@@ -34,26 +38,26 @@ module.exports.setup = (app) => {
    *                    application/json:
    *                        schema:
    *                            type: object
-   *                            properties: 
+   *                            properties:
    *                                status:
    *                                    type: string
    *                                    description: The response status
    *                                    enum: [success]
    *                                data:
    *                                    type: object
-   *                                    properties: 
+   *                                    properties:
    *                                        contacts:
    *                                            type: array
-   *                                            items: 
+   *                                            items:
    *                                                $ref: '#/components/schemas/Contact'
-   */
-
- 
-
+   *                                        metadata:
+   *                                             $ref: '#/components/schemas/PaginationMetadata'
+   */           
 
   router.get("/", contactsController.getContactsByFilter);
 
-/**
+
+  /**
    * @swagger
    * /api/v1/contacts:
    *  post:
@@ -64,7 +68,7 @@ module.exports.setup = (app) => {
    *            content:
    *                multipart/form-data:
    *                    schema:
-   *                        $ref: '#/components/schemas/Contact'
+   *                      $ref: '#/components/schemas/Contact'
    *        tags:
    *            - contacts
    *        responses:
@@ -74,48 +78,47 @@ module.exports.setup = (app) => {
    *                    application/json:
    *                        schema:
    *                            type: object
-   *                            properties: 
+   *                            properties:
    *                                status:
    *                                    type: string
    *                                    description: The response status
    *                                    enum: [success]
    *                                data:
    *                                    type: object
-   *                                    properties: 
+   *                                    properties:
    *                                        contacts:
    *                                            type: array
-   *                                            items: 
+   *                                            items:
    *                                                $ref: '#/components/schemas/Contact'
    */
 
-  router.post("/", contactsController.createContact);
+  // router.post("/", contactsController.createContact);
+  router.post("/", avatarUpload, contactsController.createContact);
 
-/**
- * @swagger
- * /api/v1/contacts:
- *  delete:
- *      summary: Delete all contacts
- *      description: Delete all contacts
- *      tags:
- *          -contacts
- *      responses:
- *          200:
- *              description: All contacts deleted
- *              $ref: '#/components/responses/200NoData'
- */
-
+  /**
+   * @swagger
+   * /api/v1/contacts:
+   *    delete:
+   *      summary: Delete all contacts
+   *      description: Delete all contacts
+   *      tags:
+   *          - contacts
+   *      responses:
+   *          200:
+   *              description: All contacts deleted
+   *              $ref: '#/components/responses/200NoData'
+   */
   router.delete("/", contactsController.deleteAllContacts);
-
   router.all("/", methodNotAllowed);
 
- /**
+  /**
    * @swagger
    * /api/v1/contacts/{id}:
    *  get:
-   *        summary: Get contacts by ID
-   *        description: Get contacts by ID
+   *        summary: Get contact by ID
+   *        description: Get contact by ID
    *        parameters:
-   *            -$ref: '#/components/parameters/contactIdParam'
+   *            - $ref: '#/components/parameters/contactIdParam'
    *        tags:
    *            - contacts
    *        responses:
@@ -125,34 +128,34 @@ module.exports.setup = (app) => {
    *                    application/json:
    *                        schema:
    *                            type: object
-   *                            properties: 
+   *                            properties:
    *                                status:
    *                                    type: string
    *                                    description: The response status
    *                                    enum: [success]
    *                                data:
    *                                    type: object
-   *                                    properties: 
+   *                                    properties:
    *                                        contacts:
    *                                           $ref: '#/components/schemas/Contact'
    */
 
   router.get("/:id", contactsController.getContact);
 
-/**
+  /**
    * @swagger
    * /api/v1/contacts/{id}:
    *  put:
    *        summary: Update contacts by ID
    *        description: Update contacts by ID
    *        parameters:
-   *            -$ref: '#/components/parameters/contactIdParam'
+   *            - $ref: '#/components/parameters/contactIdParam'
    *        requestBody:
    *            required: true
-   *            content: 
+   *            content:
    *                multipart/form-data:
    *                    schema:
-   *                        $ref: '#/components/schemas/Contact'
+   *                       $ref: '#/components/schemas/Contact'
    *        tags:
    *            - contacts
    *        responses:
@@ -162,28 +165,29 @@ module.exports.setup = (app) => {
    *                    application/json:
    *                        schema:
    *                            type: object
-   *                            properties: 
+   *                            properties:
    *                                status:
    *                                    type: string
    *                                    description: The response status
    *                                    enum: [success]
    *                                data:
    *                                    type: object
-   *                                    properties: 
+   *                                    properties:
    *                                        contacts:
    *                                           $ref: '#/components/schemas/Contact'
    */
 
-  router.put("/:id", contactsController.updateContact);
+  // router.put("/:id", contactsController.updateContact);
+  router.put('/:id', avatarUpload, contactsController.updateContact);
 
-   /**
+  /**
    * @swagger
    * /api/v1/contacts/{id}:
-   *  get:
+   *  delete:
    *        summary: Delete contact by ID
    *        description: Delete contact by ID
    *        parameters:
-   *            -$ref: '#/components/parameters/contactIdParam'
+   *            - $ref: '#/components/parameters/contactIdParam'
    *        tags:
    *            - contacts
    *        responses:

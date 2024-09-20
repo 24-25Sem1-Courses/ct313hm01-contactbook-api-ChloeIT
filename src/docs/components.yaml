@@ -3,8 +3,8 @@ components:
   schemas:
     Contact:
       type: object
-      properties: 
-        id: 
+      properties:
+        id:
           type: integer
           readOnly: true #returned by HTTP GET
         name:
@@ -22,7 +22,7 @@ components:
           description: contact phone number
         favorite:
           type: integer
-          enum: [0,1]
+          enum: [0, 1]
           default: 0
           description: favorite contact
         avatar:
@@ -35,8 +35,32 @@ components:
           writeOnly: true #used on POST/PUT/PATCH
           description: contact avatar file
 
+    PaginationMetadata:
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          default: 0
+          description: The total number of records
+        firstPage:
+          type: integer
+          default: 1
+          description: The first page
+        lastPage:
+          type: integer
+          default: 1
+          description: The last page
+        page:
+          type: integer
+          default: 1
+          description: The current page
+        limit:
+          type: integer
+          default: 5
+          description: The number of records per page
+
   responses:
-    '200NoData':
+    "200NoData":
       content:
         application/json:
           schema:
@@ -60,5 +84,25 @@ components:
       required: true
       in: path
       schema:
-        type: integer   
-        
+        type: integer
+
+    limitParam:
+      name: limit
+      description: Number of records per page
+      in: query
+      schema:
+        type: integer
+        default: 5
+        minimum: 1
+        maximum: 100
+      required: false
+
+    pageParam:
+      name: page
+      description: Page number of records
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+      required: false
